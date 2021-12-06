@@ -1,0 +1,77 @@
+<template>
+  <lightning-layout multiple-rows>
+    <lightning-layout-item size="6">
+      <br />
+      <p>
+        Lorem Ipsum is simply dummy text of the printing and typesetting
+        industry. Lorem Ipsum has been the industry's standard dummy text ever
+        since the 1500s, when an unknown printer took a galley of type and
+        scrambled it to make a type specimen book. It has survived not only five
+        centuries, but also the leap into electronic typesetting, remaining
+        essentially unchanged. It was popularised in the 1960s with the release
+        of Letraset sheets containing Lorem Ipsum passages, and more recently
+        with desktop publishing software like Aldus PageMaker including versions
+        of Lorem Ipsum.
+      </p>
+    </lightning-layout-item>
+    <lightning-layout-item size="6">
+      <lightning-layout multiple-rows>
+        <lightning-layout-item
+          size="12"
+          alignment-bump="right"
+          class="slds-float_right slds-text-align_right"
+        >
+          Descargar archivo de suministros
+          <lightning-button-icon
+            icon-name="doctype:csv"
+            variant="bare"
+            alternative-text="Download CSV"
+            title="Download CSV"
+            class="slds-float_right slds-var-p-horizontal_small"
+            onclick={getData}
+            size="large"
+          ></lightning-button-icon>
+        </lightning-layout-item>
+        <lightning-layout-item size="12" class="slds-box slds-theme_shade">
+          <lightning-layout vertical-align="center" multiple-rows>
+            <lightning-layout-item size="4" padding="around-small">
+              <lightning-input
+                type="file"
+                label="Documento:"
+                accept=".csv"
+                onchange={handleFilesChange}
+              >
+              </lightning-input>
+            </lightning-layout-item>
+            <lightning-layout-item
+              size="6"
+              alignment-bump="left"
+              class="slds-text-body_small slds-text-color_error slds-text-align_left slds-var-p-vertical_large slds-float_left slds-var-m-left_xxx-small"
+            >
+              {fileName}</lightning-layout-item
+            >
+          </lightning-layout>
+        </lightning-layout-item>
+        <lightning-layout-item
+          size="12"
+          alignment-bump="right"
+          padding="around-small"
+        >
+          <lightning-button
+            label="GUARDAR"
+            variant="brand"
+            onclick={handleSave}
+            class="slds-float_right"
+          ></lightning-button>
+        </lightning-layout-item>
+      </lightning-layout>
+    </lightning-layout-item>
+  </lightning-layout>
+  <template if:true={showLoadingSpinner}>
+    <lightning-spinner
+      alternative-text="Downloading......"
+      size="medium"
+      style="z-index: 10000 !important"
+    ></lightning-spinner>
+  </template>
+</template>
