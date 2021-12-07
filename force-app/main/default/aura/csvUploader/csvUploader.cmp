@@ -2,18 +2,21 @@
   implements="lightning:availableForFlowScreens,lightning:availableForFlowActions,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
   access="global"
 >
+  <lightning:card>
     <lightning:tabset selectedTabId="two">
-        <lightning:tab label="Vistas" id="vistas">
-            One Content !
-        </lightning:tab>
-        <lightning:tab label="AGRUPACIONES" id="agrupaciones">
-            Two Content !
-        </lightning:tab>
-        <lightning:tab label="NOTIFICACIONES" id="notificaciones">
-            Three Content !
-        </lightning:tab>
-        <lightning:tab label="CONFIGURACION DE SUMINSTROS" id="configdesuminstros">
-           <c:csvUploaderComponent></c:csvUploaderComponent>
-        </lightning:tab>
+      <lightning:tab label="Vistas" id="vistas"> One Content ! </lightning:tab>
+      <lightning:tab label="AGRUPACIONES" id="agrupaciones">
+        Two Content !
+      </lightning:tab>
+      <lightning:tab label="NOTIFICACIONES" id="notificaciones">
+        Three Content !
+      </lightning:tab>
+      <lightning:tab
+        label="CONFIGURACION DE SUMINSTROS"
+        id="configdesuminstros"
+      >
+        <c:csvUploaderComponent></c:csvUploaderComponent>
+      </lightning:tab>
     </lightning:tabset>
+  </lightning:card>
 </aura:component>

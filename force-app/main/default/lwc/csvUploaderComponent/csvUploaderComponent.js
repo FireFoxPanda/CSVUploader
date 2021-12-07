@@ -1,5 +1,6 @@
-import { LightningElement, track, wire } from "lwc";
+import { LightningElement, track, wire, api } from "lwc";
 import getDataList from "@salesforce/apex/csvUploaderController.getData";
+import updateDataList from "@salesforce/apex/csvUploaderController.updateData";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import { loadScript } from "lightning/platformResourceLoader";
 import PARSER from "@salesforce/resourceUrl/PapaParse";
@@ -11,6 +12,10 @@ export default class CsvUploaderComponent extends LightningElement {
   filesUploaded;
   fileName;
   parserInitialized = false;
+  columnMapping = {
+    CUPS: "Id",
+    "Data Quality": "Data_Quality_Description__c"
+  };
 
   getData() {
     this.showLoadingSpinner = true;
@@ -23,7 +28,7 @@ export default class CsvUploaderComponent extends LightningElement {
       })
       .catch((error) => {
         this.error = error;
-
+        this.showLoadingSpinner = false;
         this.dispatchEvent(
           new ShowToastEvent({
             title: "Error while getting Data",
@@ -36,6 +41,7 @@ export default class CsvUploaderComponent extends LightningElement {
   }
 
   downloadCSVFile() {
+    const headerMapping = this.columnMapping;
     let rowEnd = "\n";
     let csvString = "";
     // this set elminates the duplicates if have any duplicate keys
@@ -46,11 +52,11 @@ export default class CsvUploaderComponent extends LightningElement {
     this.data.forEach(function (record) {
       Object.keys(record).forEach(function (key) {
         console.log(key);
-        if (key === "Id") {
-          columnHeader.add("CUPS");
-        } else {
-          columnHeader.add(key);
-        }
+        let fieldLabel = Object.keys(headerMapping).find(
+          (objKey) => headerMapping[objKey] === key
+        );
+        fieldLabel ? columnHeader.add(fieldLabel) : columnHeader.add(key);
+
         rowData.add(key);
       });
     });
@@ -109,13 +115,23 @@ export default class CsvUploaderComponent extends LightningElement {
   handleSave() {
     if (this.filesUploaded) {
       const file = this.filesUploaded;
+      const headerMapping = this.columnMapping;
       Papa.parse(file, {
         quoteChar: '"',
         header: "true",
+        skipEmptyLines: "true",
+        Worker: "true",
+
+        transformHeader: function (h) {
+          return headerMapping.hasOwnProperty(h) && headerMapping[h] != ""
+            ? headerMapping[h]
+            : h;
+        },
         complete: (results) => {
           const result = results.data;
 
           console.log("result  ", result);
+          this.updateData(result);
         },
         error: (error) => {
           console.error(error);
@@ -149,5 +165,36 @@ export default class CsvUploaderComponent extends LightningElement {
         })
         .catch((error) => console.error(error));
     }
+  }
+
+  @api async updateData(result) {
+    this.showLoadingSpinner = true;
+
+    await updateDataList({ recordList: result })
+      .then(() => {
+        this.dispatchEvent(
+          new ShowToastEvent({
+            title: "Success",
+            message: "Records Updated Successfully",
+            variant: "Success"
+          })
+        );
+        console.log("Updated");
+        this.showLoadingSpinner = false;
+      })
+      .catch((error) => {
+        this.error = error;
+        console.log(error);
+
+        this.dispatchEvent(
+          new ShowToastEvent({
+            title: "Error!",
+            message: error.body.message,
+            variant: "error"
+          })
+        );
+        this.showLoadingSpinner = false;
+        this.data = undefined;
+      });
   }
 }
